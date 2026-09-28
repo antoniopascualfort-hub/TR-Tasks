@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tareas">
+<meta name="theme-color" content="#0E2A47">
+<link rel="apple-touch-icon" href="icono.png">
+<link rel="icon" href="icono.png">
+<title>Tareas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--deep:#07182A;--blue:#0E2A47;--sky:#7FB2E5;--paper:#F3F8FD;--ink:#0E2A47;--soft:rgba(255,255,255,.6);--card:rgba(255,255,255,.08);--line:rgba(255,255,255,.14)}
+*{box-sizing:border-box}html,body{margin:0}
+body{min-height:100vh;background:radial-gradient(125% 62% at 50% 0%,#1A5183 0%,var(--blue) 50%,var(--deep) 100%);background-attachment:fixed;color:#fff;font-family:"Nunito",system-ui,-apple-system,sans-serif;line-height:1.45;-webkit-tap-highlight-color:transparent}
+main{max-width:520px;margin:0 auto;padding:calc(28px + env(safe-area-inset-top)) 22px calc(46px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+header img{width:44px;height:44px;border-radius:12px;flex:none}
+h1{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:2.1rem;margin:0;line-height:1}
+.date{color:var(--soft);font-size:.9rem;margin:2px 0 0;text-transform:capitalize}
+form{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px}
+.line{display:flex;gap:10px}
+.line+.line{margin-top:10px}
+input{font:inherit;width:100%;border:0;border-radius:12px;background:rgba(255,255,255,.09);color:#fff;min-height:50px;padding:12px 14px;color-scheme:dark}
+input::placeholder{color:rgba(255,255,255,.45)}
+input:focus{outline:2px solid var(--sky)}
+.line .go{flex:none;width:54px;min-height:50px;border:0;border-radius:12px;background:var(--sky);color:var(--deep);font-size:1.5rem;font-weight:700;line-height:1;cursor:pointer}
+h2{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:1.15rem;margin:30px 0 2px;color:#fff}
+h2 small{font-family:"Nunito",sans-serif;font-weight:600;font-size:.8rem;color:var(--soft);margin-left:8px}
+.vale{position:relative;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;background:var(--paper);color:var(--ink);border-radius:14px;padding:15px 18px 15px 16px;margin-top:12px}
+.vale::before,.vale::after{content:"";position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--deep);transform:translateY(-50%)}
+.vale::before{left:-9px}.vale::after{right:-9px}
+.ico{width:42px;height:42px;border-radius:50%;background:#DCEAF8;border:0;display:grid;place-items:center;font-size:1.15rem;color:var(--blue);cursor:pointer;padding:0;font-weight:700}
+.vale small{display:block;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:#5B7897;font-weight:700;cursor:pointer}
+.vale b{display:block;font-family:"Fraunces",Georgia,serif;font-size:1.08rem;line-height:1.25;cursor:pointer}
+.vale span.det{display:block;color:#5B7897;font-size:.88rem;margin-top:2px}
+.vale.done{opacity:.5}
+.vale.done b{text-decoration:line-through}
+.vale.done .ico{background:var(--blue);color:#fff}
+.edit{grid-column:1/3;display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.edit input{min-height:42px;font-size:.86rem;padding:8px 10px;background:#E7F0F9;color:var(--ink);border-radius:10px;color-scheme:light;width:auto;flex:1;min-width:120px}
+.edit button{font:inherit;font-size:.86rem;font-weight:700;border:0;border-radius:10px;padding:10px 12px;min-height:42px;background:#DCEAF8;color:var(--blue);cursor:pointer}
+.edit button.del{background:none;color:#7E93A9}
+.empty{color:var(--soft);text-align:center;padding:50px 0;font-family:"Fraunces",Georgia,serif;font-size:1.1rem}
+.clear{display:block;margin:28px auto 0;font:inherit;font-size:.88rem;color:var(--soft);background:none;border:0;text-decoration:underline;cursor:pointer;padding:10px}
+button:focus-visible,input:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="icono.png" alt="">
+    <div><h1>Tareas</h1><p class="date" id="fecha"></p></div>
+  </header>
+
+  <form id="form">
+    <div class="line">
+      <input id="txt" placeholder="Apunta una tarea" autocomplete="off" enterkeyhint="done">
+      <button class="go" type="submit" aria-label="Añadir">+</button>
+    </div>
+    <div class="line">
+      <input type="date" id="dia" aria-label="Día">
+      <input type="time" id="hora" aria-label="Hora">
+    </div>
+  </form>
+
+  <div id="list"></div>
+  <button class="clear" id="clear" hidden>Borrar las hechas</button>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const KEY = "tareas-simple";
+const iso = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const parse = s => { const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||""); return m? new Date(+m[1],+m[2]-1,+m[3]) : null; };
+const lunes = () => { const d=new Date(); d.setDate(d.getDate() + ((8 - d.getDay()) % 7 || 7)); return iso(d); };
+const hoy = () => iso(new Date());
+
+let tareas = [];
+try { tareas = JSON.parse(localStorage.getItem(KEY)) || []; } catch(e){ tareas = []; }
+if (!tareas.length) tareas = [{t:"Ir con Guillermo a Calderías a asegurar que rellenan el cargador", f:lunes(), h:"", d:false}];
+tareas.forEach(t => { if (t.f === undefined) t.f=""; if (t.h === undefined) t.h="";
+  if (!t.f && !t.d && /calder/i.test(t.t)) t.f = lunes(); });
+const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(tareas)); }catch(e){} render(); };
+$("fecha").textContent = new Date().toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"});
+
+function grupo(f){
+  if (!f) return "Sin día";
+  const man = iso(new Date(Date.now()+864e5));
+  if (f < hoy()) return "Atrasadas";
+  if (f === hoy()) return "Hoy";
+  if (f === man) return "Mañana";
+  return parse(f).toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"});
+}
+function etiqueta(t){
+  if (t.d) return "Hecha";
+  if (!t.f) return "Sin día";
+  if (t.f < hoy()) return "Atrasada";
+  if (t.f === hoy()) return "Para hoy";
+  if (t.f === iso(new Date(Date.now()+864e5))) return "Para mañana";
+  return "Para el " + parse(t.f).toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"});
+}
+
+function ics(t){
+  const f = t.f.replace(/-/g,"");
+  const esc = s => String(s).replace(/([,;\\])/g,"\\$1").replace(/\n/g,"\\n");
+  let dt;
+  if (t.h){
+    const [H,M] = t.h.split(":").map(Number), end = parse(t.f); end.setHours(H, M+60);
+    dt = "DTSTART:"+f+"T"+t.h.replace(":","")+"00\r\nDTEND:"+iso(end).replace(/-/g,"")+"T"+String(end.getHours()).padStart(2,"0")+String(end.getMinutes()).padStart(2,"0")+"00";
+  } else {
+    const fin = parse(t.f); fin.setDate(fin.getDate()+1);
+    dt = "DTSTART;VALUE=DATE:"+f+"\r\nDTEND;VALUE=DATE:"+iso(fin).replace(/-/g,"");
+  }
+  return ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Tareas//ES","BEGIN:VEVENT","UID:"+Date.now()+"@tareas",
+    "DTSTAMP:"+new Date().toISOString().replace(/[-:]/g,"").split(".")[0]+"Z", dt, "SUMMARY:"+esc(t.t),
+    "END:VEVENT","END:VCALENDAR"].join("\r\n");
+}
+async function alCalendario(t){
+  const blob = new Blob([ics(t)],{type:"text/calendar"});
+  const file = new File([blob],"tarea.ics",{type:"text/calendar"});
+  try{ if (navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file]}); return; } }
+  catch(e){ if (e && e.name==="AbortError") return; }
+  const url = URL.createObjectURL(blob);
+  const a=document.createElement("a"); a.href=url; a.download="tarea.ics"; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),4000);
+}
+
+function vale(t){
+  const el = document.createElement("article");
+  el.className = "vale" + (t.d ? " done" : "");
+  el.innerHTML = '<button class="ico" aria-label="Marcar"></button><div><small></small><b></b>'
+    + '<span class="det"></span></div><div class="edit" hidden>'
+    + '<input type="date" aria-label="Día"><input type="time" aria-label="Hora">'
+    + '<button class="cal">Al calendario</button><button class="del">Borrar</button></div>';
+  el.querySelector(".ico").textContent = t.d ? "✓" : "○";
+  el.querySelector("small").textContent = etiqueta(t);
+  el.querySelector("b").textContent = t.t;
+  const det = el.querySelector(".det");
+  det.textContent = t.h ? "A las " + t.h : "";
+  if (!t.h) det.hidden = true;
+
+  const toggle = () => { t.d = !t.d; save(); };
+  el.querySelector(".ico").onclick = toggle;
+  el.querySelector("b").onclick = toggle;
+
+  const edit = el.querySelector(".edit");
+  el.querySelector("small").onclick = () => { edit.hidden = !edit.hidden; };
+  const [di, ho] = edit.querySelectorAll("input");
+  di.value = t.f; ho.value = t.h;
+  di.onchange = () => { t.f = di.value; save(); };
+  ho.onchange = () => { t.h = ho.value; save(); };
+  edit.querySelector(".cal").onclick = () => { if (!t.f) { di.focus(); return; } alCalendario(t); };
+  edit.querySelector(".del").onclick = () => { tareas = tareas.filter(x => x !== t); save(); };
+  return el;
+}
+
+function render(){
+  const box = $("list"); box.innerHTML = "";
+  const abiertas = tareas.filter(t=>!t.d), hechas = tareas.filter(t=>t.d);
+  if (!tareas.length){ box.innerHTML = '<p class="empty">Todo en orden.</p>'; $("clear").hidden = true; return; }
+  const g = new Map();
+  abiertas.slice().sort((a,b)=>((a.f||"9999")+(a.h||"99")).localeCompare((b.f||"9999")+(b.h||"99")))
+    .forEach(t => { const k = grupo(t.f); if(!g.has(k)) g.set(k,[]); g.get(k).push(t); });
+  const peso = k => k==="Atrasadas"?-2 : k==="Hoy"?-1 : k==="Sin día"?9 : 0;
+  [...g.keys()].sort((a,b)=>peso(a)-peso(b)).forEach(k => {
+    const h2=document.createElement("h2");
+    h2.textContent = k;
+    const s=document.createElement("small"); s.textContent = g.get(k).length; h2.appendChild(s);
+    box.appendChild(h2);
+    g.get(k).forEach(t => box.appendChild(vale(t)));
+  });
+  if (hechas.length){
+    const h2=document.createElement("h2"); h2.textContent="Hechas"; box.appendChild(h2);
+    hechas.forEach(t => box.appendChild(vale(t)));
+  }
+  $("clear").hidden = !hechas.length;
+}
+$("form").onsubmit = e => {
+  e.preventDefault();
+  const v = $("txt").value.trim(); if (!v) return;
+  tareas.unshift({t:v, f:$("dia").value||"", h:$("hora").value||"", d:false});
+  $("txt").value=""; $("hora").value="";
+  save();
+};
+$("clear").onclick = () => { tareas = tareas.filter(t=>!t.d); save(); };
+save();
+</script>
+</body>
+</html>
